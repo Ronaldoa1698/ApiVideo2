@@ -24,7 +24,7 @@ use Doctrine\ORM\Mapping as ORM;
         new Put(),
         new Delete(),
     ],
-    routePrefix: '/cc', normalizationContext: [
+    routePrefix: '/dx', normalizationContext: [
     'skip_null_values' => false
 ]
 )]
