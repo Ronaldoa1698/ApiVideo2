@@ -12,6 +12,8 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\VideoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -58,6 +60,14 @@ class Video
     #[ORM\ManyToOne(inversedBy: 'videos')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
+
+    #[ORM\ManyToMany(targetEntity: VideoTag::class, mappedBy: 'video')]
+    private Collection $videoTags;
+
+    public function __construct()
+    {
+        $this->videoTags = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -144,6 +154,33 @@ class Video
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, VideoTag>
+     */
+    public function getVideoTags(): Collection
+    {
+        return $this->videoTags;
+    }
+
+    public function addVideoTag(VideoTag $videoTag): static
+    {
+        if (!$this->videoTags->contains($videoTag)) {
+            $this->videoTags->add($videoTag);
+            $videoTag->addVideo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVideoTag(VideoTag $videoTag): static
+    {
+        if ($this->videoTags->removeElement($videoTag)) {
+            $videoTag->removeVideo($this);
+        }
 
         return $this;
     }
